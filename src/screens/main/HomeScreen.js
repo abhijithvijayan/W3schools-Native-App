@@ -1,18 +1,20 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, Platform, BackHandler, ToastAndroid  } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 class HomeScreen extends Component {
 
     constructor(props) {
         super(props)
+        this.lastBackButtonPress = null;
     
         this.state = {
-          canGoBack: false
+          canGoBack: false,
+          ref: null,
         }
     }  
     
-    componentDidMount() {
+    componentDidMount() {        
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
     
@@ -21,28 +23,24 @@ class HomeScreen extends Component {
     }
 
     handleBackPress = () => {
-        if (this.state.canGoBack) {
-           this.refWeb.goBack();
-        } else {
+        if (this.lastBackButtonPress + 2000 >= new Date().getTime()) {
             BackHandler.exitApp();
+            return true;
         }
+        if (this.state.canGoBack && this.state.ref) {
+            this.state.ref.goBack();
+        }
+        this.lastBackButtonPress = new Date().getTime();
         return true;
-    }
-     
-    onNavigationStateChange = (navState) => {
-         this.setState({
-            canGoBack: navState.canGoBack
-         });
-     }
-                    
+    }                 
 
     renderWebView() {
         return (
             <WebView 
                 source={{ uri: 'https://w3schools.com' }}   
-                ref={(myWeb) => this.refWeb = myWeb}
+                ref={(webView) => this.state.ref = webView}
                 decelerationRate='normal'
-                onNavigationStateChange={(e) => this.onNavigationStateChange(e)} 
+                onNavigationStateChange={(navState) => this.state.canGoBack = navState.canGoBack } 
                 scalesPageToFit={true}                
                 startInLoadingState={true}
                 mixedContentMode='always'
