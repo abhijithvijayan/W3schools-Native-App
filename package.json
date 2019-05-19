@@ -7,6 +7,7 @@
     "android": "react-native run-android",
     "bundle:android": "cd android && ./gradlew assembleRelease",
     "build:android": "react-native run-android --variant=release",
+    "android-emulator": "emulator -avd Pixel2 -gpu on -memory 4096",
     "test": "jest"
   },
   "dependencies": {
